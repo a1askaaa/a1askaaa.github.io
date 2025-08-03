@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unser erstes Jahr zusammen ❤️</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(45deg, #ffb6c1, #ffc0cb, #ffe4e1, #fff0f5);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating hearts animation */
+        .heart {
+            position: absolute;
+            color: rgba(255, 182, 193, 0.6);
+            font-size: 20px;
+            animation: float 6s infinite ease-in-out;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.6; }
+            50% { transform: translateY(-20px) rotate(10deg); opacity: 1; }
+        }
+
+        .heart:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
+        .heart:nth-child(2) { top: 20%; right: 15%; animation-delay: 1s; }
+        .heart:nth-child(3) { top: 40%; left: 5%; animation-delay: 2s; }
+        .heart:nth-child(4) { top: 60%; right: 10%; animation-delay: 3s; }
+        .heart:nth-child(5) { top: 80%; left: 20%; animation-delay: 4s; }
+        .heart:nth-child(6) { top: 30%; right: 5%; animation-delay: 5s; }
+        .heart:nth-child(7) { top: 15%; left: 80%; animation-delay: 1.5s; }
+        .heart:nth-child(8) { top: 50%; right: 20%; animation-delay: 2.5s; }
+        .heart:nth-child(9) { top: 70%; left: 15%; animation-delay: 3.5s; }
+        .heart:nth-child(10) { top: 90%; right: 25%; animation-delay: 4.5s; }
+
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .header h1 {
+            color: #8b008b;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #ff1493;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .timeline-container {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(to bottom, #ff69b4, #ff1493, #dc143c);
+            transform: translateX(-50%);
+            border-radius: 2px;
+            box-shadow: 0 0 10px rgba(255, 20, 147, 0.3);
+            animation: curvedLine 12s ease-in-out infinite;
+        }
+
+        @keyframes curvedLine {
+            0% { transform: translateX(-50%) scaleX(1); }
+            25% { transform: translateX(-60%) scaleX(1) skewY(2deg); }
+            50% { transform: translateX(-40%) scaleX(1) skewY(-1deg); }
+            75% { transform: translateX(-55%) scaleX(1) skewY(1.5deg); }
+            100% { transform: translateX(-50%) scaleX(1); }
+        }
+
+        .photo-item {
+            position: relative;
+            margin: 40px 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .photo-item:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .polaroid {
+            perspective: 1000px;
+            width: 280px;
+            height: 320px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .polaroid:hover {
+            transform: scale(1.05);
+        }
+
+        .polaroid-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+
+        .polaroid.flipped .polaroid-inner {
+            transform: rotateY(180deg);
+        }
+
+        .polaroid-front, .polaroid-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .polaroid-back {
+            transform: rotateY(180deg);
+            background: linear-gradient(135deg, #fff, #ffe4e1);
+        }
+
+       .polaroid {
+            perspective: 1000px;
+            width: 280px;
+            height: 320px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .photo-placeholder {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
+            border: 2px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+
+        .polaroid-photo {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .polaroid-video {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            background: #000;
+        }
+
+        .polaroid-gif {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .love-message {
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8b008b;
+            font-size: clamp(10px, 2.5vw, 16px);
+            font-weight: bold;
+            text-align: center;
+            line-height: 1.3;
+            padding: 10px;
+            background: linear-gradient(45deg, rgba(255,182,193,0.2), rgba(255,192,203,0.2));
+            border-radius: 4px;
+            margin-bottom: 10px;
+            overflow-wrap: break-word;
+            hyphens: auto;
+        }
+
+        @media (max-width: 768px) {
+            .polaroid { width: 220px; height: 280px; }
+            .photo-placeholder { height: 170px; }
+            .polaroid-photo { height: 170px; }
+            .polaroid-video { height: 170px; }
+            .polaroid-gif { height: 170px; }
+            .love-message { height: 170px; }
+        }
+
+        .photo-date {
+            font-size: 12px;
+            color: #666;
+            font-weight: bold;
+            text-align: center;
+        }
+
+       
+
+        .love-message.short-text { font-size: 16px; }
+        .love-message.medium-text { font-size: 13px; }
+        .love-message.long-text { font-size: 11px; }
+        .love-message.very-long-text { font-size: 10px; }
+
+        .heart-decoration {
+            color: #ff1493;
+            font-size: 16px;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 50%;
+            bottom: -8px;
+            width: 16px;
+            height: 16px;
+            background: #ff1493;
+            border: 3px solid white;
+            border-radius: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 10px rgba(255, 20, 147, 0.5);
+            z-index: 5;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: #8b008b;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+       
+    </style>
+</head>
+<body>
+    <!-- Floating hearts and mice -->
+    <div class="heart">💕</div>
+    <div class="heart">💖</div>
+    <div class="heart">💗</div>
+    <div class="heart">💝</div>
+    <div class="heart">💘</div>
+    <div class="heart">💞</div>
+    <div class="heart">🐭</div>
+    <div class="heart">🐁</div>
+    <div class="heart">🐭</div>
+    <div class="heart">🐁</div>
+
+    <div class="header">
+        <h1>Unser erstes Jahr zusammen 💕</h1>
+        <p>I love you meine Mausi</p>
+    </div>
+
+    <div class="timeline-container">
+        <div class="timeline-line"></div>
+        
+        <div class="photo-item">
+            <div class="timeline-dot"></div>
+            <div class="polaroid" onclick="flipCard(this)">
+                <div class="polaroid-inner">
+                    <div class="polaroid-front">
+                        <!-- For photos: <img src="photo1.jpg" alt="Our memory" class="polaroid-photo"> -->
+                        <!-- For GIFs: <img src="funny-moment.gif" alt="Our funny moment" class="polaroid-gif"> -->
+                        <!-- For videos: <video src="our-video.mp4" class="polaroid-video" autoplay muted loop playsinline></video> -->
+                         <img src="pics/pic1.jpeg" alt="Our memory" class="polaroid-photo">
+                        <div class="photo-date">06. Mai 2024</div>
+                    </div>
+                    <div class="polaroid-back">
+                        <div class="love-message short-text" >Das war unser aller erstes Bild zusammen als du mich beim zweiten Date in Leipzip besucht hast und auch direkt hier übernachtet hast. Ich will mit dir noch viele Sonnenuntergänge am Völki so angucken</div>
+                        <div class="heart-decoration">💖💗💖</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="photo-item">
+            <div class="timeline-dot"></div>
+            <div class="polaroid" onclick="flipCard(this)">
+                <div class="polaroid-inner">
+                    <div class="polaroid-front">
+                        <img src="pics/pic3.jpeg" alt="Our memory" class="polaroid-photo">
+                        <div class="photo-date">Juni 2024</div>
+                    </div>
+                    <div class="polaroid-back">
+                        <div class="love-message">Der Blick hat mich dann endgültig rumgekriegt</div>
+                        <div class="heart-decoration">💘💝💘</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="photo-item">
+            <div class="timeline-dot"></div>
+            <div class="polaroid" onclick="flipCard(this)">
+                <div class="polaroid-inner">
+                    <div class="polaroid-front">
+                        <img src="pics/pic4.jpeg" alt="Our memory" class="polaroid-photo">
+                        <div class="photo-date">Juli 2024</div>
+                    </div>
+                    <div class="polaroid-back">
+                        <div class="love-message">Und deine weiche Backi hat mich verzaubert. Ich will nur noch deine Backi and meiner haben, für immer</div>
+                        <div class="heart-decoration">💞💕💞</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="photo-item">
+            <div class="timeline-dot"></div>
+            <div class="polaroid" onclick="flipCard(this)">
+                <div class="polaroid-inner">
+                    <div class="polaroid-front">
+                         <video src="pics/vid1.mp4" class="polaroid-video" autoplay muted loop playsinline></video>
+                        <div class="photo-date">20. Juli 2024</div>
+                    </div>
+                    <div class="polaroid-back">
+                        <div class="love-message">Willst du mit mir, im T4, wieder in den Urlaub hier ? oder woanders :D </div>
+                        <div class="heart-decoration">💞💕💞</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="photo-item">
+            <div class="timeline-dot"></div>
+            <div class="polaroid" onclick="flipCard(this)">
+                <div class="polaroid-inner">
+                    <div class="polaroid-front">
+                        <img src="pics/pic5.jpeg" alt="Our memory" class="polaroid-photo">
+                        <div class="photo-date">03. August 2024</div>
+                    </div>
+                    <div class="polaroid-back">
+                        <div class="love-message medium-text">Das ist wirklich eins meiner Lieblingsbilder von uns. Wir sind ein hübsches Pärchen, wir sollten mehr draus machen XD</div>
+                        <div class="heart-decoration">💖💗💖</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="photo-item">
+            <div class="timeline-dot"></div>
+            <div class="polaroid" onclick="flipCard(this)">
+                <div class="polaroid-inner">
+                    <div class="polaroid-front">
+                        <img src="pics/pic6.jpeg" alt="Our memory" class="polaroid-photo">
+                        <div class="photo-date">03. September 2024</div>
+                    </div>
+                    <div class="polaroid-back">
+                        <div class="love-message medium-text">Das Bild hat Luises Schwester gesehen und gesagt sie ist hin und weg davon wie schön du bist. Guck! viele sehen das. Nicht nur ich. Und du solltest das auch sehen 💘 </div>
+                        <div class="heart-decoration">💘💝</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="photo-item">
+            <div class="timeline-dot"></div>
+            <div class="polaroid" onclick="flipCard(this)">
+                <div class="polaroid-inner">
+                    <div class="polaroid-front">
+                        <img src="pics/pic7.jpeg" alt="Our memory" class="polaroid-photo">
+                        <div class="photo-date">Novemebr 2024</div>
+                    </div>
+                    <div class="polaroid-back">
+                        <div class="love-message">Ich will noch so viele Spiele mit dir zocken. Ich liebe es, dass wirde gleichermaßen Spielkinder sind ✨</div>
+                        <div class="heart-decoration">💞💕💞</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+
+        <div class="photo-item">
+            <div class="timeline-dot"></div>
+            <div class="polaroid" onclick="flipCard(this)">
+                <div class="polaroid-inner">
+                    <div class="polaroid-front">
+                        <img src="pics/pic8.jpeg" alt="Our memory" class="polaroid-photo">
+                        <div class="photo-date">Dezember 2024</div>
+                    </div>
+                    <div class="polaroid-back">
+                        <div class="love-message">Twinning is winning, oder ?</div>
+                        <div class="heart-decoration">💖💗💖</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="photo-item">
+            <div class="timeline-dot"></div>
+            <div class="polaroid" onclick="flipCard(this)">
+                <div class="polaroid-inner">
+                    <div class="polaroid-front">
+                        <img src="pics/pic9.jpeg" alt="Our memory" class="polaroid-photo">
+                        <div class="photo-date">Dezember 2024</div>
+                    </div>
+                    <div class="polaroid-back">
+                        <div class="love-message">Du bist mein Sonnenschein ☀️</div>
+                        <div class="heart-decoration">💘💝💘</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="photo-item">
+            <div class="timeline-dot"></div>
+            <div class="polaroid" onclick="flipCard(this)">
+                <div class="polaroid-inner">
+                    <div class="polaroid-front">
+                        <img src="pics/pic10.jpeg" alt="Our memory" class="polaroid-photo">
+                        <div class="photo-date">Dezember 2024</div>
+                    </div>
+                    <div class="polaroid-back">
+                        <div class="love-message">Abenteuer in Prag zusammen</div>
+                        <div class="heart-decoration">💞💕💞</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+         <div class="photo-item">
+            <div class="timeline-dot"></div>
+            <div class="polaroid" onclick="flipCard(this)">
+                <div class="polaroid-inner">
+                    <div class="polaroid-front">
+                        <img src="pics/pic11.jpeg" alt="Our memory" class="polaroid-photo">
+                        <div class="photo-date">Dezember 2024</div>
+                    </div>
+                    <div class="polaroid-back">
+                        <div class="love-message">und das hoffentlich noch ganz oft  💫</div>
+                        <div class="heart-decoration">💖💗💖</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="photo-item">
+            <div class="timeline-dot"></div>
+            <div class="polaroid" onclick="flipCard(this)">
+                <div class="polaroid-inner">
+                    <div class="polaroid-front">
+                        <img src="pics/pic12.jpeg" alt="Our memory" class="polaroid-photo">
+                        <div class="photo-date">Februar 2025</div>
+                    </div>
+                    <div class="polaroid-back">
+                        <div class="love-message">Gemeinsam schaffen wir alles, auch ein Urlaub in Norwegen bei 0° und im Auto schalfen. </div>
+                        <div class="heart-decoration">💘💝💘</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="photo-item">
+            <div class="timeline-dot"></div>
+            <div class="polaroid" onclick="flipCard(this)">
+                <div class="polaroid-inner">
+                    <div class="polaroid-front">
+                        <!-- For photos: <img src="photo15.jpg" alt="Our memory" class="polaroid-photo"> -->
+                        <!-- For GIFs: <img src="funny-moment.gif" alt="Our funny moment" class="polaroid-gif"> -->
+                        <!-- For videos: <video src="our-video.mp4" class="polaroid-video" autoplay muted loop playsinline></video> -->
+                         <video src="pics/vid3.mp4" class="polaroid-video" autoplay muted loop playsinline></video>
+                        <div class="photo-date">März 2025</div>
+                    </div>
+                    <div class="polaroid-back">
+                        <div class="love-message">I got the badest bitch of them all</div>
+                        <div class="heart-decoration">💘💝💘</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="photo-item">
+            <div class="timeline-dot"></div>
+            <div class="polaroid" onclick="flipCard(this)">
+                <div class="polaroid-inner">
+                    <div class="polaroid-front">
+                        <img src="pics/pic17.jpeg" alt="Our memory" class="polaroid-photo">
+                        <div class="photo-date">April 2025</div>
+                    </div>
+                    <div class="polaroid-back">
+                        <div class="love-message medium-text">Ich wünsche mir mehr süße Dates mit dir. Und ja die wünsche ich mir auch wenn wir nicht grade beisammen sind. Ich denke immer an dich und möchte immer mit dir Zeit verbringen</div>
+                        <div class="heart-decoration">💘💝💘</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="photo-item">
+            <div class="timeline-dot"></div>
+            <div class="polaroid" onclick="flipCard(this)">
+                <div class="polaroid-inner">
+                    <div class="polaroid-front">
+                        <img src="pics/pic16.jpeg" alt="kayak" class="polaroid-photo">
+                        <div class="photo-date">Mai 2025</div>
+                    </div>
+                    <div class="polaroid-back">
+                        <div class="love-message">Mit dir ist jeder Tag wie ein Abenteuer 🌟 </div>
+                        <div class="heart-decoration">💞💕💞</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="photo-item">
+            <div class="timeline-dot"></div>
+            <div class="polaroid" onclick="flipCard(this)">
+                <div class="polaroid-inner">
+                    <div class="polaroid-front">
+                        <img src="pics/pic13.jpeg" alt="Our memory" class="polaroid-photo">
+                        <div class="photo-date">01. Juni 2025</div>
+                    </div>
+                    <div class="polaroid-back">
+                        <div class="love-message">Du bist so eine hotte Mausi, die hottest in meiner Welt 🔥</div>
+                        <div class="heart-decoration">💞💕💞</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="photo-item">
+            <div class="timeline-dot"></div>
+            <div class="polaroid" onclick="flipCard(this)">
+                <div class="polaroid-inner">
+                    <div class="polaroid-front">
+                         <video src="pics/vid2.mp4" class="polaroid-video" autoplay muted loop playsinline></video>
+                        <div class="photo-date">Juni 2025</div>
+                    </div>
+                    <div class="polaroid-back">
+                        <div class="love-message">Das war so unglaublich schön mit dir da</div>
+                        <div class="heart-decoration">💘💝💘</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="photo-item">
+            <div class="timeline-dot"></div>
+            <div class="polaroid" onclick="flipCard(this)">
+                <div class="polaroid-inner">
+                    <div class="polaroid-front">
+                        <img src="pics/pic2.jpeg" alt="Our memory" class="polaroid-photo">
+                        <div class="photo-date">Juni 2025</div>
+                    </div>
+                    <div class="polaroid-back">
+                        <div class="love-message medium-text">Noch ein Abenteuer mit meiner Adventure-Maus. Du bist so krass und du weißt es gar nicht meine kleine Pfadfinderin 🎁</div>
+                        <div class="heart-decoration">💞💕💞</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="photo-item">
+            <div class="timeline-dot"></div>
+            <div class="polaroid" onclick="flipCard(this)">
+                <div class="polaroid-inner">
+                    <div class="polaroid-front">
+                         <video src="pics/vid4.mp4" class="polaroid-video" autoplay muted loop playsinline></video>
+                        <div class="photo-date">Juni 2025</div>
+                    </div>
+                    <div class="polaroid-back">
+                        <div class="love-message">Es macht doch so hot dass du eine kleine outdoor mausi bist</div>
+                        <div class="heart-decoration">💘💝💘</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="photo-item">
+            <div class="timeline-dot"></div>
+            <div class="polaroid" onclick="flipCard(this)">
+                <div class="polaroid-inner">
+                    <div class="polaroid-front">
+                        <img src="pics/pic14.jpeg" alt="Our memory" class="polaroid-photo">
+                        <div class="photo-date">Juli 2025</div>
+                    </div>
+                    <div class="polaroid-back">
+                        <div class="love-message">Ich bin stolz auf dich und unterstüze dich bei allem bebelo, just so you know</div>
+                        <div class="heart-decoration">💖💗💖</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="photo-item">
+            <div class="timeline-dot"></div>
+            <div class="polaroid" onclick="flipCard(this)">
+                <div class="polaroid-inner">
+                    <div class="polaroid-front">
+                        <img src="pics/pic15.jpeg" alt="Our memory" class="polaroid-photo">
+                        <div class="photo-date">Juli 2025</div>
+                    </div>
+                    <div class="polaroid-back">
+                        <div class="love-message">Du bist meine Rose</div>
+                        <div class="heart-decoration">💘💝💘</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <p>Ein ganzes Jahr voller Liebe, Lachen und unvergesslicher Momente 💕</p>
+        <p>Auf viele weitere wundervolle Jahre zusammen! 💖</p>
+    </div>
+
+    <script>
+        function flipCard(element) {
+            element.classList.toggle('flipped');
+        }
+
+        // Add some interactive sparkle effects
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.polaroid')) {
+                // Create sparkles at random positions around the click point
+                const baseX = e.clientX;
+                const baseY = e.clientY;
+                
+                // Create 3 sparkles at random offsets
+                for (let i = 0; i < 3; i++) {
+                    const offsetX = (Math.random() - 0.5) * 60; // Random offset between -30 and 30
+                    const offsetY = (Math.random() - 0.5) * 60;
+                    createSparkle(baseX + offsetX, baseY + offsetY);
+                }
+            }
+        });
+
+        function createSparkle(x, y) {
+            const sparkle = document.createElement('div');
+            sparkle.innerHTML = '✨';
+            sparkle.style.position = 'fixed';
+            sparkle.style.left = x + 'px';
+            sparkle.style.top = y + 'px';
+            sparkle.style.pointerEvents = 'none';
+            sparkle.style.fontSize = '20px';
+            sparkle.style.zIndex = '1000';
+            sparkle.style.animation = 'sparkleFloat 2s ease-out forwards';
+            
+            document.body.appendChild(sparkle);
+            
+            setTimeout(() => {
+                if (sparkle.parentNode) {
+                    sparkle.parentNode.removeChild(sparkle);
+                }
+            }, 2000);
+        }
+
+        // Add CSS for sparkle animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes sparkleFloat {
+                0% { opacity: 1; transform: translateY(0px) scale(1); }
+                100% { opacity: 0; transform: translateY(-50px) scale(0.5); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
