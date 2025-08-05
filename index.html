@@ -674,7 +674,7 @@
             </div>
         </div>
 
-        <div class="photo-item">
+       <div class="photo-item">
             <div class="timeline-dot"></div>
             <div class="polaroid" onclick="flipCard(this)">
                 <div class="polaroid-inner">
@@ -682,3 +682,134 @@
                         <img src="pics/pic2.jpeg" alt="Our memory" class="polaroid-photo">
                         <div class="photo-date">Juni 2025</div>
                     </div>
+                    <div class="polaroid-back">
+                        <div class="love-message medium-text">Noch ein Abenteuer mit meiner Adventure-Maus. Du bist so krass und du weißt es gar nicht meine kleine Pfadfinderin 🎁</div>
+                        <div class="heart-decoration">💞💕💞</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="photo-item">
+            <div class="timeline-dot"></div>
+            <div class="polaroid" onclick="flipCard(this)">
+                <div class="polaroid-inner">
+                    <div class="polaroid-front">
+                         <video src="pics/vid4.mp4" class="polaroid-video" autoplay muted loop playsinline></video>
+                        <div class="photo-date">Juni 2025</div>
+                    </div>
+                    <div class="polaroid-back">
+                        <div class="love-message">Es macht doch so hot dass du eine kleine outdoor mausi bist</div>
+                        <div class="heart-decoration">💘💝💘</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="photo-item">
+            <div class="timeline-dot"></div>
+            <div class="polaroid" onclick="flipCard(this)">
+                <div class="polaroid-inner">
+                    <div class="polaroid-front">
+                        <img src="pics/pic14.jpeg" alt="Our memory" class="polaroid-photo">
+                        <div class="photo-date">Juli 2025</div>
+                    </div>
+                    <div class="polaroid-back">
+                        <div class="love-message">Ich bin stolz auf dich und unterstüze dich bei allem bebelo, just so you know</div>
+                        <div class="heart-decoration">💖💗💖</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="photo-item">
+            <div class="timeline-dot"></div>
+            <div class="polaroid" onclick="flipCard(this)">
+                <div class="polaroid-inner">
+                    <div class="polaroid-front">
+                        <img src="pics/pic15.jpeg" alt="Our memory" class="polaroid-photo">
+                        <div class="photo-date">Juli 2025</div>
+                    </div>
+                    <div class="polaroid-back">
+                        <div class="love-message">Du bist meine Rose</div>
+                        <div class="heart-decoration">💘💝💘</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Ein ganzes Jahr voller Liebe, Lachen und unvergesslicher Momente</p>
+        <div class="footer-badge">🎉 Auf viele weitere wundervolle Jahre zusammen! 🎉</div>
+    </div>
+
+    <script>
+        function flipCard(element) {
+            element.classList.toggle('flipped');
+            
+            // Add fun click effect
+            const rect = element.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+            createClickEffect(x, y);
+        }
+
+        function createClickEffect(x, y) {
+            const effect = document.createElement('div');
+            effect.innerHTML = '💖';
+            effect.className = 'click-effect';
+            effect.style.left = x + 'px';
+            effect.style.top = y + 'px';
+            effect.style.fontSize = '24px';
+            effect.style.position = 'fixed';
+            effect.style.pointerEvents = 'none';
+            effect.style.zIndex = '9999';
+            
+            document.body.appendChild(effect);
+            
+            setTimeout(() => {
+                if (effect.parentNode) {
+                    effect.parentNode.removeChild(effect);
+                }
+            }, 1000);
+        }
+
+        // Enhanced sparkle party effects
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.polaroid')) {
+                const baseX = e.clientX;
+                const baseY = e.clientY;
+                
+                // Create multiple sparkles for a party effect
+                for (let i = 0; i < 5; i++) {
+                    const offsetX = (Math.random() - 0.5) * 80;
+                    const offsetY = (Math.random() - 0.5) * 80;
+                    createSparkleParty(baseX + offsetX, baseY + offsetY);
+                }
+            }
+        });
+
+        function createSparkleParty(x, y) {
+            const sparkles = ['✨', '🌟', '💫', '⭐', '🎉'];
+            const sparkle = document.createElement('div');
+            sparkle.innerHTML = sparkles[Math.floor(Math.random() * sparkles.length)];
+            sparkle.style.position = 'fixed';
+            sparkle.style.left = x + 'px';
+            sparkle.style.top = y + 'px';
+            sparkle.style.pointerEvents = 'none';
+            sparkle.style.fontSize = '22px';
+            sparkle.style.zIndex = '1000';
+            sparkle.style.animation = 'sparkleParty 2s ease-out forwards';
+            
+            document.body.appendChild(sparkle);
+            
+            setTimeout(() => {
+                if (sparkle.parentNode) {
+                    sparkle.parentNode.removeChild(sparkle);
+                }
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
