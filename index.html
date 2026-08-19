@@ -422,6 +422,20 @@
             transform: scale(1.1) rotate(90deg);
         }
 
+        .settings-btn {
+            right: 24px;
+            bottom: 98px;
+            width: 46px;
+            height: 46px;
+            font-size: 20px;
+            animation: none;
+            background: linear-gradient(135deg, #4b5563, #1f2937);
+        }
+
+        .settings-btn:hover {
+            transform: scale(1.1) rotate(20deg);
+        }
+
         .edit-hint {
             font-size: clamp(0.85rem, 2vw, 1rem);
             font-weight: 500;
@@ -522,6 +536,31 @@
             resize: vertical;
         }
 
+        .card-modal-status {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #d92626;
+            min-height: 1.2em;
+        }
+
+        .card-modal-status.info {
+            color: #4f46e5;
+        }
+
+        .token-modal-info {
+            font-size: 0.85rem;
+            color: #4b5563;
+            line-height: 1.6;
+            margin-bottom: 14px;
+        }
+
+        .token-modal-info code {
+            background: #eef0ff;
+            padding: 1px 6px;
+            border-radius: 6px;
+        }
+
         .card-modal-actions {
             display: flex;
             flex-wrap: wrap;
@@ -603,8 +642,7 @@
         <h1>Unser erstes Jahr zusammen</h1>
         <p>I love you Mausi </p>
         <div class="fun-badge">✨ Anniversary Edition ✨</div>
-        <p class="edit-hint">💡 Karte antippen zum Umdrehen, lange gedrückt halten oder ✏️ antippen zum Bearbeiten</p>
-    </div>
+      </div>
 
     <div class="timeline-container">
         <div class="timeline-line"></div>
@@ -1096,6 +1134,7 @@
         <div class="footer-badge">🎉 Auf viele weitere mausige Jahre zusammen! 🎉</div>
     </div>
 
+    <button id="settingsBtn" class="add-card-btn settings-btn" aria-label="GitHub-Zugang einrichten" title="GitHub-Zugang einrichten">🔑</button>
     <button id="addCardBtn" class="add-card-btn" aria-label="Neue Karte hinzufügen" title="Neue Erinnerung hinzufügen">+</button>
 
     <div id="cardModalOverlay" class="card-modal-overlay">
@@ -1114,11 +1153,32 @@
             <label class="card-modal-label" for="cardModalMessage">Text</label>
             <textarea id="cardModalMessage" class="card-modal-textarea" placeholder="Eure Erinnerung..."></textarea>
 
+            <p class="card-modal-status" id="cardModalStatus"></p>
+
             <div class="card-modal-actions">
                 <button type="button" class="card-modal-btn danger" id="cardModalDeleteBtn">🗑️ Löschen</button>
-                <button type="button" class="card-modal-btn secondary" id="cardModalResetBtn">↺ Zurücksetzen</button>
                 <button type="button" class="card-modal-btn ghost" id="cardModalCancelBtn">Abbrechen</button>
                 <button type="button" class="card-modal-btn primary" id="cardModalSaveBtn">💾 Speichern</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="tokenModalOverlay" class="card-modal-overlay">
+        <div class="card-modal">
+            <h2>GitHub-Zugang einrichten</h2>
+            <p class="token-modal-info">
+                Damit Änderungen für euch beide sichtbar gespeichert werden, committet die Seite direkt ins GitHub-Repo. Dafür braucht dieser Browser einmalig einen Token mit Schreibrecht:<br><br>
+                1. Auf GitHub: <b>Settings → Developer settings → Fine-grained tokens → Generate new token</b><br>
+                2. Repository access: nur <code>a1askaaa.github.io</code> auswählen<br>
+                3. Permissions: <b>Contents → Read and write</b><br>
+                4. Token unten einfügen — er bleibt nur lokal in diesem Browser gespeichert.
+            </p>
+            <input type="password" id="tokenInput" class="card-modal-input" placeholder="ghp_... oder github_pat_...">
+            <p class="card-modal-status" id="tokenModalStatus"></p>
+            <div class="card-modal-actions">
+                <button type="button" class="card-modal-btn danger" id="tokenClearBtn">Entfernen</button>
+                <button type="button" class="card-modal-btn ghost" id="tokenCancelBtn">Abbrechen</button>
+                <button type="button" class="card-modal-btn primary" id="tokenSaveBtn">Speichern</button>
             </div>
         </div>
     </div>
@@ -1190,67 +1250,133 @@
             }, 2000);
         }
 
-        /* ===================== Editable cards ===================== */
+        /* ===================== Editable cards (synced to GitHub) ===================== */
 
-        const OVERRIDES_KEY = 'annivOverrides';
-        const CUSTOM_KEY = 'annivCustomCards';
-        const DB_NAME = 'annivMediaDB';
-        const STORE_NAME = 'media';
+        const GH_OWNER = 'a1askaaa';
+        const GH_REPO = 'a1askaaa.github.io';
+        const GH_BRANCH = 'main';
+        const GH_FILE_PATH = 'index.html';
+        const GH_TOKEN_KEY = 'annivGithubToken';
         const LONG_PRESS_MS = 500;
         const MOVE_TOLERANCE = 10;
+        const MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
 
-        // --- IndexedDB helpers (stores uploaded images/videos as Blobs) ---
-        function idbOpen() {
-            return new Promise((resolve, reject) => {
-                const req = indexedDB.open(DB_NAME, 1);
-                req.onupgradeneeded = () => req.result.createObjectStore(STORE_NAME);
-                req.onsuccess = () => resolve(req.result);
-                req.onerror = () => reject(req.error);
+        // --- GitHub token storage (kept only in this browser) ---
+        function getGithubToken() { return localStorage.getItem(GH_TOKEN_KEY) || ''; }
+        function setGithubToken(t) {
+            if (t) localStorage.setItem(GH_TOKEN_KEY, t);
+            else localStorage.removeItem(GH_TOKEN_KEY);
+        }
+
+        // --- base64 helpers (UTF-8 safe) ---
+        function utf8ToBase64(str) {
+            const bytes = new TextEncoder().encode(str);
+            let binary = '';
+            const chunkSize = 0x8000;
+            for (let i = 0; i < bytes.length; i += chunkSize) {
+                binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
+            }
+            return btoa(binary);
+        }
+
+        function base64ToUtf8(b64) {
+            const binary = atob(b64.replace(/\n/g, ''));
+            const bytes = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+            return new TextDecoder('utf-8').decode(bytes);
+        }
+
+        function arrayBufferToBase64(buffer) {
+            const bytes = new Uint8Array(buffer);
+            let binary = '';
+            const chunkSize = 0x8000;
+            for (let i = 0; i < bytes.length; i += chunkSize) {
+                binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
+            }
+            return btoa(binary);
+        }
+
+        function sanitizeFilename(name) {
+            return (name || 'datei').replace(/[^a-zA-Z0-9.\-_]/g, '_').slice(-60);
+        }
+
+        function escapeHtml(str) {
+            return (str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        // --- GitHub Contents API ---
+        async function ghRequest(path, options = {}) {
+            const token = getGithubToken();
+            const headers = Object.assign({ 'Accept': 'application/vnd.github+json' }, options.headers || {});
+            if (token) headers['Authorization'] = 'Bearer ' + token;
+            const res = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/${path}`, Object.assign({}, options, { headers }));
+            if (!res.ok) {
+                const errBody = await res.json().catch(() => ({}));
+                const err = new Error((errBody && errBody.message) || ('GitHub-Fehler ' + res.status));
+                err.status = res.status;
+                throw err;
+            }
+            return res.status === 204 ? null : res.json();
+        }
+
+        function ghGetFile(path) {
+            return ghRequest(`contents/${path}?ref=${GH_BRANCH}&_=${Date.now()}`);
+        }
+
+        function ghPutFile(path, base64Content, sha, message) {
+            const body = { message, content: base64Content, branch: GH_BRANCH };
+            if (sha) body.sha = sha;
+            return ghRequest(`contents/${path}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
             });
         }
 
-        async function idbPut(id, blob) {
-            const db = await idbOpen();
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction(STORE_NAME, 'readwrite');
-                tx.objectStore(STORE_NAME).put(blob, id);
-                tx.oncomplete = () => resolve();
-                tx.onerror = () => reject(tx.error);
+        function ghDeleteFile(path, sha, message) {
+            return ghRequest(`contents/${path}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message, sha, branch: GH_BRANCH })
             });
         }
 
-        async function idbGet(id) {
-            const db = await idbOpen();
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction(STORE_NAME, 'readonly');
-                const req = tx.objectStore(STORE_NAME).get(id);
-                req.onsuccess = () => resolve(req.result);
-                req.onerror = () => reject(req.error);
-            });
+        async function fetchRemoteDoc() {
+            const file = await ghGetFile(GH_FILE_PATH);
+            const html = base64ToUtf8(file.content);
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            return { doc, sha: file.sha };
         }
 
-        async function idbDelete(id) {
-            const db = await idbOpen();
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction(STORE_NAME, 'readwrite');
-                tx.objectStore(STORE_NAME).delete(id);
-                tx.oncomplete = () => resolve();
-                tx.onerror = () => reject(tx.error);
-            });
+        function serializeDoc(doc) {
+            return '<!DOCTYPE html>\n' + doc.documentElement.outerHTML;
         }
 
-        // --- localStorage helpers ---
-        function getOverrides() {
-            try { return JSON.parse(localStorage.getItem(OVERRIDES_KEY) || '{}'); }
-            catch (e) { return {}; }
+        function buildCardHTMLString(date, message, mediaPath, mediaType) {
+            const mediaTag = mediaType === 'video'
+                ? `<video src="${escapeHtml(mediaPath)}" class="polaroid-video" autoplay muted loop playsinline></video>`
+                : `<img src="${escapeHtml(mediaPath)}" alt="Our memory" class="polaroid-photo">`;
+            return `
+        <div class="photo-item">
+            <div class="timeline-dot"></div>
+            <div class="polaroid">
+                <div class="polaroid-inner">
+                    <div class="polaroid-front">
+                        ${mediaTag}
+                        <div class="photo-date">${escapeHtml(date)}</div>
+                    </div>
+                    <div class="polaroid-back">
+                        <div class="love-message ${textSizeClass(message)}">${escapeHtml(message)}</div>
+                        <div class="heart-decoration">💕💖💕</div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
         }
-        function setOverrides(data) { localStorage.setItem(OVERRIDES_KEY, JSON.stringify(data)); }
-
-        function getCustomCards() {
-            try { return JSON.parse(localStorage.getItem(CUSTOM_KEY) || '[]'); }
-            catch (e) { return []; }
-        }
-        function setCustomCards(data) { localStorage.setItem(CUSTOM_KEY, JSON.stringify(data)); }
 
         // --- Card content helpers ---
         function textSizeClass(text) {
@@ -1396,58 +1522,18 @@
             return item;
         }
 
-        function initOriginalCards() {
-            document.querySelectorAll('.timeline-container > .photo-item').forEach((item, i) => {
-                const polaroid = item.querySelector('.polaroid');
-                const front = polaroid.querySelector('.polaroid-front');
-                const back = polaroid.querySelector('.polaroid-back');
-                const dateEl = front.querySelector('.photo-date');
-                const msgEl = back.querySelector('.love-message');
-                const mediaEl = front.querySelector('.polaroid-photo, .polaroid-video, .polaroid-gif');
-
-                polaroid.dataset.cardId = 'orig-' + i;
-                polaroid.dataset.origDate = dateEl ? dateEl.textContent.trim() : '';
-                polaroid.dataset.origMessage = msgEl ? msgEl.textContent.trim() : '';
-                polaroid.dataset.origSrc = mediaEl ? mediaEl.getAttribute('src') : '';
-                polaroid.dataset.origType = mediaEl && mediaEl.tagName === 'VIDEO' ? 'video' : 'image';
-
+        function initCardInteractions() {
+            document.querySelectorAll('.timeline-container > .photo-item .polaroid').forEach(polaroid => {
                 addEditButtons(polaroid);
                 attachCardInteractions(polaroid);
             });
         }
 
-        async function applyOverrides() {
-            const overrides = getOverrides();
-            const polaroids = document.querySelectorAll('.polaroid[data-card-id^="orig-"]');
-            for (const polaroid of polaroids) {
-                const ov = overrides[polaroid.dataset.cardId];
-                if (!ov) continue;
-                updateCardText(polaroid, ov.date, ov.message);
-                if (ov.mediaId) {
-                    try {
-                        const blob = await idbGet(ov.mediaId);
-                        if (blob) {
-                            const url = URL.createObjectURL(blob);
-                            setCardMedia(polaroid.querySelector('.polaroid-front'), url, ov.mediaType);
-                        }
-                    } catch (e) { /* ignore missing media */ }
-                }
-            }
-        }
-
-        async function loadCustomCards() {
-            const container = document.querySelector('.timeline-container');
-            const cards = getCustomCards();
-            for (const c of cards) {
-                let src = '';
-                if (c.mediaId) {
-                    try {
-                        const blob = await idbGet(c.mediaId);
-                        if (blob) src = URL.createObjectURL(blob);
-                    } catch (e) { /* ignore missing media */ }
-                }
-                container.appendChild(buildCardDOM(c.id, c.date, c.message, src, c.mediaType));
-            }
+        // Index of a card's wrapper among all .photo-item — used to locate the
+        // same card in a freshly-fetched copy of index.html when syncing.
+        function cardIndex(polaroid) {
+            const photoItem = polaroid.closest('.photo-item');
+            return Array.from(document.querySelectorAll('.timeline-container > .photo-item')).indexOf(photoItem);
         }
 
         // --- Editor modal ---
@@ -1459,15 +1545,26 @@
         const cardModalDate = document.getElementById('cardModalDate');
         const cardModalMessage = document.getElementById('cardModalMessage');
         const cardModalDeleteBtn = document.getElementById('cardModalDeleteBtn');
-        const cardModalResetBtn = document.getElementById('cardModalResetBtn');
         const cardModalCancelBtn = document.getElementById('cardModalCancelBtn');
         const cardModalSaveBtn = document.getElementById('cardModalSaveBtn');
+        const cardModalStatus = document.getElementById('cardModalStatus');
         const addCardBtn = document.getElementById('addCardBtn');
+        const settingsBtn = document.getElementById('settingsBtn');
+
+        const tokenModalOverlay = document.getElementById('tokenModalOverlay');
+        const tokenInput = document.getElementById('tokenInput');
+        const tokenModalStatus = document.getElementById('tokenModalStatus');
+        const tokenSaveBtn = document.getElementById('tokenSaveBtn');
+        const tokenClearBtn = document.getElementById('tokenClearBtn');
+        const tokenCancelBtn = document.getElementById('tokenCancelBtn');
 
         let modalMode = 'edit';
         let modalTargetPolaroid = null;
         let modalSelectedFile = null;
         let modalPreviewObjectUrl = null;
+        let modalOrigDate = '';
+        let modalOrigMessage = '';
+        let pendingAfterToken = null;
 
         function showModalPreview(src, type) {
             if (modalPreviewObjectUrl) {
@@ -1493,6 +1590,16 @@
             cardModalPreview.appendChild(el);
         }
 
+        function setModalStatus(message, isInfo) {
+            cardModalStatus.textContent = message || '';
+            cardModalStatus.classList.toggle('info', !!isInfo);
+        }
+
+        function setModalBusy(busy) {
+            [cardModalSaveBtn, cardModalDeleteBtn, cardModalCancelBtn, cardModalChangeMediaBtn].forEach(b => b.disabled = busy);
+            cardModalSaveBtn.textContent = busy ? '⏳ Speichert...' : '💾 Speichern';
+        }
+
         function openModal() { cardModalOverlay.classList.add('open'); }
         function closeModal() {
             cardModalOverlay.classList.remove('open');
@@ -1502,6 +1609,8 @@
             }
             modalSelectedFile = null;
             modalTargetPolaroid = null;
+            setModalStatus('');
+            setModalBusy(false);
             cardModalFileInput.value = '';
         }
 
@@ -1509,6 +1618,7 @@
             modalMode = 'edit';
             modalTargetPolaroid = polaroid;
             modalSelectedFile = null;
+            setModalStatus('');
 
             const front = polaroid.querySelector('.polaroid-front');
             const back = polaroid.querySelector('.polaroid-back');
@@ -1516,17 +1626,18 @@
             const msgEl = back.querySelector('.love-message');
             const mediaEl = front.querySelector('.polaroid-photo, .polaroid-video, .polaroid-gif');
 
+            modalOrigDate = dateEl ? dateEl.textContent.trim() : '';
+            modalOrigMessage = msgEl ? msgEl.textContent.trim() : '';
+
             cardModalTitle.textContent = 'Karte bearbeiten';
-            cardModalDate.value = dateEl ? dateEl.textContent.trim() : '';
-            cardModalMessage.value = msgEl ? msgEl.textContent.trim() : '';
+            cardModalDate.value = modalOrigDate;
+            cardModalMessage.value = modalOrigMessage;
 
             const existingSrc = mediaEl ? mediaEl.getAttribute('src') : '';
             const existingType = mediaEl && mediaEl.tagName === 'VIDEO' ? 'video' : 'image';
             showModalPreview(existingSrc, existingType);
 
-            const isCustom = polaroid.dataset.cardId.startsWith('custom-');
-            cardModalDeleteBtn.style.display = isCustom ? 'inline-flex' : 'none';
-            cardModalResetBtn.style.display = isCustom ? 'none' : 'inline-flex';
+            cardModalDeleteBtn.style.display = 'inline-flex';
 
             openModal();
         }
@@ -1535,6 +1646,7 @@
             modalMode = 'create';
             modalTargetPolaroid = null;
             modalSelectedFile = null;
+            setModalStatus('');
 
             cardModalTitle.textContent = 'Neue Erinnerung hinzufügen';
             cardModalDate.value = '';
@@ -1542,7 +1654,6 @@
             showModalPreview(null, null);
 
             cardModalDeleteBtn.style.display = 'none';
-            cardModalResetBtn.style.display = 'none';
 
             openModal();
         }
@@ -1571,111 +1682,202 @@
             if (e.key === 'Escape' && cardModalOverlay.classList.contains('open')) closeModal();
         });
 
-        cardModalSaveBtn.addEventListener('click', async () => {
+        // --- Sync one card's edit into a freshly-fetched copy of index.html, then commit ---
+        async function performEditSave(polaroid, dateVal, msgVal, file, mediaType) {
+            const index = cardIndex(polaroid);
+
+            let mediaPath = null;
+            if (file) {
+                setModalStatus('Bild/Video wird hochgeladen...', true);
+                mediaPath = 'pics/upload-' + Date.now() + '-' + sanitizeFilename(file.name);
+                const buf = await file.arrayBuffer();
+                await ghPutFile(mediaPath, arrayBufferToBase64(buf), null, `Bild/Video hinzugefügt: ${dateVal}`);
+            }
+
+            setModalStatus('Seite wird aktualisiert...', true);
+            const { doc, sha } = await fetchRemoteDoc();
+            const items = doc.querySelectorAll('.timeline-container > .photo-item');
+            const item = items[index];
+            if (!item) throw new Error('Karte wurde auf dem Server nicht gefunden. Bitte Seite neu laden und erneut versuchen.');
+
+            const remoteDateEl = item.querySelector('.photo-date');
+            const remoteMsgEl = item.querySelector('.love-message');
+            if (remoteDateEl.textContent.trim() !== modalOrigDate || remoteMsgEl.textContent.trim() !== modalOrigMessage) {
+                throw new Error('Diese Karte wurde inzwischen anderswo verändert. Bitte Seite neu laden und erneut bearbeiten.');
+            }
+
+            remoteDateEl.textContent = dateVal;
+            remoteMsgEl.textContent = msgVal;
+            remoteMsgEl.className = 'love-message ' + textSizeClass(msgVal);
+
+            if (mediaPath) {
+                const front = item.querySelector('.polaroid-front');
+                const oldMedia = front.querySelector('.polaroid-photo, .polaroid-video, .polaroid-gif');
+                const newEl = mediaType === 'video' ? doc.createElement('video') : doc.createElement('img');
+                if (mediaType === 'video') {
+                    newEl.setAttribute('autoplay', '');
+                    newEl.setAttribute('muted', '');
+                    newEl.setAttribute('loop', '');
+                    newEl.setAttribute('playsinline', '');
+                    newEl.className = 'polaroid-video';
+                } else {
+                    newEl.className = 'polaroid-photo';
+                    newEl.alt = 'Our memory';
+                }
+                newEl.setAttribute('src', mediaPath);
+                if (oldMedia) oldMedia.replaceWith(newEl);
+                else front.insertBefore(newEl, front.firstChild);
+            }
+
+            await ghPutFile(GH_FILE_PATH, utf8ToBase64(serializeDoc(doc)), sha, `Karte bearbeitet: ${dateVal}`);
+
+            updateCardText(polaroid, dateVal, msgVal);
+            if (mediaPath) {
+                setCardMedia(polaroid.querySelector('.polaroid-front'), URL.createObjectURL(file), mediaType);
+            }
+        }
+
+        async function performCreate(dateVal, msgVal, file, mediaType) {
+            let mediaPath = '';
+            if (file) {
+                setModalStatus('Bild/Video wird hochgeladen...', true);
+                mediaPath = 'pics/upload-' + Date.now() + '-' + sanitizeFilename(file.name);
+                const buf = await file.arrayBuffer();
+                await ghPutFile(mediaPath, arrayBufferToBase64(buf), null, `Bild/Video hinzugefügt: ${dateVal}`);
+            }
+
+            setModalStatus('Seite wird aktualisiert...', true);
+            const { doc, sha } = await fetchRemoteDoc();
+            doc.querySelector('.timeline-container').insertAdjacentHTML('beforeend', buildCardHTMLString(dateVal, msgVal, mediaPath, mediaType));
+            await ghPutFile(GH_FILE_PATH, utf8ToBase64(serializeDoc(doc)), sha, `Neue Karte hinzugefügt: ${dateVal}`);
+
+            const localUrl = file ? URL.createObjectURL(file) : '';
+            const newItem = buildCardDOM('card-' + Date.now(), dateVal, msgVal, localUrl, mediaType);
+            document.querySelector('.timeline-container').appendChild(newItem);
+        }
+
+        async function performDelete(polaroid) {
+            const index = cardIndex(polaroid);
+
+            setModalStatus('Seite wird aktualisiert...', true);
+            const { doc, sha } = await fetchRemoteDoc();
+            const items = doc.querySelectorAll('.timeline-container > .photo-item');
+            const item = items[index];
+            if (!item) throw new Error('Karte wurde auf dem Server nicht gefunden. Bitte Seite neu laden.');
+
+            const remoteDateEl = item.querySelector('.photo-date');
+            const remoteMsgEl = item.querySelector('.love-message');
+            if (remoteDateEl.textContent.trim() !== modalOrigDate || remoteMsgEl.textContent.trim() !== modalOrigMessage) {
+                throw new Error('Diese Karte wurde inzwischen anderswo verändert. Bitte Seite neu laden.');
+            }
+
+            const mediaEl = item.querySelector('.polaroid-photo, .polaroid-video, .polaroid-gif');
+            const mediaSrc = mediaEl ? mediaEl.getAttribute('src') : null;
+
+            item.remove();
+            await ghPutFile(GH_FILE_PATH, utf8ToBase64(serializeDoc(doc)), sha, `Karte gelöscht: ${modalOrigDate}`);
+
+            if (mediaSrc && mediaSrc.startsWith('pics/upload-')) {
+                try {
+                    const fileInfo = await ghGetFile(mediaSrc);
+                    await ghDeleteFile(mediaSrc, fileInfo.sha, `Ungenutzte Datei entfernt: ${mediaSrc}`);
+                } catch (e) { /* best effort cleanup, ignore failures */ }
+            }
+
+            polaroid.closest('.photo-item').remove();
+        }
+
+        async function doSaveFlow() {
             const dateVal = cardModalDate.value.trim();
             const msgVal = cardModalMessage.value.trim();
 
-            if (!msgVal) { alert('Bitte einen Text eingeben.'); return; }
-            if (modalMode === 'create' && !modalSelectedFile) { alert('Bitte ein Bild oder Video auswählen.'); return; }
-
-            let mediaId = null, mediaType = null;
-            if (modalSelectedFile) {
-                mediaId = 'media-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
-                mediaType = modalSelectedFile.type.startsWith('video/') ? 'video' : 'image';
-                try {
-                    await idbPut(mediaId, modalSelectedFile);
-                } catch (e) {
-                    alert('Das Bild/Video konnte nicht gespeichert werden (evtl. zu groß für den Browser-Speicher).');
-                    return;
-                }
+            if (!msgVal) { setModalStatus('Bitte einen Text eingeben.'); return; }
+            if (modalMode === 'create' && !modalSelectedFile) { setModalStatus('Bitte ein Bild oder Video auswählen.'); return; }
+            if (modalSelectedFile && modalSelectedFile.size > MAX_UPLOAD_BYTES) {
+                setModalStatus('Die Datei ist größer als 20 MB. Bitte ein kleineres Bild/Video wählen.');
+                return;
             }
 
-            if (modalMode === 'edit') {
-                const id = modalTargetPolaroid.dataset.cardId;
-                updateCardText(modalTargetPolaroid, dateVal, msgVal);
+            const mediaType = modalSelectedFile ? (modalSelectedFile.type.startsWith('video/') ? 'video' : 'image') : null;
 
-                if (id.startsWith('custom-')) {
-                    const cards = getCustomCards();
-                    const card = cards.find(c => c.id === id);
-                    if (card) {
-                        card.date = dateVal;
-                        card.message = msgVal;
-                        if (mediaId) { card.mediaId = mediaId; card.mediaType = mediaType; }
-                        setCustomCards(cards);
-                    }
+            setModalBusy(true);
+            try {
+                if (modalMode === 'edit') {
+                    await performEditSave(modalTargetPolaroid, dateVal, msgVal, modalSelectedFile, mediaType);
                 } else {
-                    const overrides = getOverrides();
-                    const ov = overrides[id] || {};
-                    ov.date = dateVal;
-                    ov.message = msgVal;
-                    if (mediaId) { ov.mediaId = mediaId; ov.mediaType = mediaType; }
-                    overrides[id] = ov;
-                    setOverrides(overrides);
+                    await performCreate(dateVal, msgVal, modalSelectedFile, mediaType);
                 }
-
-                if (mediaId) {
-                    const url = URL.createObjectURL(modalSelectedFile);
-                    setCardMedia(modalTargetPolaroid.querySelector('.polaroid-front'), url, mediaType);
-                }
-            } else {
-                const id = 'custom-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
-                const cards = getCustomCards();
-                cards.push({ id, date: dateVal, message: msgVal, mediaId, mediaType });
-                setCustomCards(cards);
-
-                const url = URL.createObjectURL(modalSelectedFile);
-                const container = document.querySelector('.timeline-container');
-                container.appendChild(buildCardDOM(id, dateVal, msgVal, url, mediaType));
+                closeModal();
+            } catch (e) {
+                setModalBusy(false);
+                if (e.status === 401) { setGithubToken(''); }
+                setModalStatus((e.status === 401 ? 'Token ungültig oder abgelaufen. Bitte neu hinterlegen. ' : '') + e.message);
             }
+        }
 
-            closeModal();
-        });
-
-        cardModalDeleteBtn.addEventListener('click', async () => {
+        async function doDeleteFlow() {
             if (!modalTargetPolaroid) return;
-            if (!confirm('Diese Karte wirklich löschen?')) return;
+            if (!confirm('Diese Karte wirklich für alle löschen?')) return;
 
-            const id = modalTargetPolaroid.dataset.cardId;
-            const cards = getCustomCards();
-            const target = cards.find(c => c.id === id);
-            setCustomCards(cards.filter(c => c.id !== id));
-            if (target && target.mediaId) {
-                try { await idbDelete(target.mediaId); } catch (e) { /* ignore */ }
+            setModalBusy(true);
+            try {
+                await performDelete(modalTargetPolaroid);
+                closeModal();
+            } catch (e) {
+                setModalBusy(false);
+                if (e.status === 401) { setGithubToken(''); }
+                setModalStatus((e.status === 401 ? 'Token ungültig oder abgelaufen. Bitte neu hinterlegen. ' : '') + e.message);
             }
-            modalTargetPolaroid.closest('.photo-item').remove();
-            closeModal();
+        }
+
+        // --- Token modal ---
+        function requireToken(action) {
+            if (getGithubToken()) { action(); return; }
+            pendingAfterToken = action;
+            tokenInput.value = '';
+            tokenModalStatus.textContent = '';
+            tokenModalOverlay.classList.add('open');
+        }
+
+        function closeTokenModal() {
+            tokenModalOverlay.classList.remove('open');
+            pendingAfterToken = null;
+        }
+
+        tokenSaveBtn.addEventListener('click', () => {
+            const val = tokenInput.value.trim();
+            if (!val) { tokenModalStatus.textContent = 'Bitte einen Token eingeben.'; return; }
+            setGithubToken(val);
+            const action = pendingAfterToken;
+            pendingAfterToken = null;
+            tokenModalOverlay.classList.remove('open');
+            if (action) action();
         });
 
-        cardModalResetBtn.addEventListener('click', async () => {
-            if (!modalTargetPolaroid) return;
-
-            const id = modalTargetPolaroid.dataset.cardId;
-            const overrides = getOverrides();
-            const ov = overrides[id];
-            if (ov && ov.mediaId) {
-                try { await idbDelete(ov.mediaId); } catch (e) { /* ignore */ }
-            }
-            delete overrides[id];
-            setOverrides(overrides);
-
-            updateCardText(modalTargetPolaroid, modalTargetPolaroid.dataset.origDate, modalTargetPolaroid.dataset.origMessage);
-            setCardMedia(
-                modalTargetPolaroid.querySelector('.polaroid-front'),
-                modalTargetPolaroid.dataset.origSrc,
-                modalTargetPolaroid.dataset.origType
-            );
-
-            closeModal();
+        tokenClearBtn.addEventListener('click', () => {
+            setGithubToken('');
+            tokenInput.value = '';
+            tokenModalStatus.textContent = 'Token entfernt.';
         });
+
+        tokenCancelBtn.addEventListener('click', closeTokenModal);
+        tokenModalOverlay.addEventListener('click', (e) => {
+            if (e.target === tokenModalOverlay) closeTokenModal();
+        });
+
+        settingsBtn.addEventListener('click', () => {
+            tokenInput.value = getGithubToken();
+            tokenModalStatus.textContent = '';
+            tokenModalOverlay.classList.add('open');
+        });
+
+        cardModalSaveBtn.addEventListener('click', () => requireToken(doSaveFlow));
+        cardModalDeleteBtn.addEventListener('click', () => requireToken(doDeleteFlow));
 
         addCardBtn.addEventListener('click', openEditorForNewCard);
 
         // --- Init ---
-        (async function initEditableCards() {
-            initOriginalCards();
-            await applyOverrides();
-            await loadCustomCards();
-        })();
+        initCardInteractions();
     </script>
 </body>
 </html>
