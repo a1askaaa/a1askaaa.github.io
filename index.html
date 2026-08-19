@@ -361,6 +361,211 @@
             }
         }
 
+        /* Editable cards */
+        .polaroid {
+            -webkit-touch-callout: none;
+            user-select: none;
+        }
+
+        .card-edit-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(6px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 20;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+            opacity: 0.8;
+        }
+
+        .card-edit-btn:hover {
+            transform: scale(1.15);
+            opacity: 1;
+        }
+
+        /* Floating add button */
+        .add-card-btn {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            width: 62px;
+            height: 62px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4, #667eea);
+            background-size: 200% 200%;
+            animation: colorFlow 6s linear infinite;
+            color: #fff;
+            font-size: 32px;
+            font-weight: 700;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            z-index: 500;
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .add-card-btn:hover {
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        .edit-hint {
+            font-size: clamp(0.85rem, 2vw, 1rem);
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.85);
+            margin-top: 6px;
+        }
+
+        /* Card editor modal */
+        .card-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(20, 10, 30, 0.55);
+            backdrop-filter: blur(6px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .card-modal-overlay.open {
+            display: flex;
+        }
+
+        .card-modal {
+            width: 100%;
+            max-width: 420px;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: linear-gradient(135deg, #fff 0%, #fff0f5 100%);
+            border-radius: 24px;
+            padding: 28px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35);
+        }
+
+        .card-modal h2 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 18px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card-modal-media-preview {
+            width: 100%;
+            height: 200px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #f8f9ff, #e8f4fd);
+            border: 3px dashed #c7d2fe;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 12px;
+            color: #6366f1;
+            font-weight: 600;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .card-modal-media-preview img,
+        .card-modal-media-preview video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-modal-label {
+            display: block;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #4f46e5;
+            margin: 14px 0 6px;
+        }
+
+        .card-modal-input,
+        .card-modal-textarea {
+            width: 100%;
+            border: 2px solid #e5deee;
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            color: #1a1a1a;
+            background: #fff;
+        }
+
+        .card-modal-input:focus,
+        .card-modal-textarea:focus {
+            outline: none;
+            border-color: #9d8ee0;
+        }
+
+        .card-modal-textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        .card-modal-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+
+        .card-modal-btn {
+            border: none;
+            border-radius: 50px;
+            padding: 10px 18px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            font-family: inherit;
+            transition: transform 0.15s ease;
+        }
+
+        .card-modal-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .card-modal-btn.primary {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            color: #fff;
+        }
+
+        .card-modal-btn.secondary {
+            background: #eef0ff;
+            color: #4f46e5;
+        }
+
+        .card-modal-btn.ghost {
+            background: transparent;
+            color: #6b7280;
+        }
+
+        .card-modal-btn.danger {
+            background: #ffe3e3;
+            color: #d92626;
+            margin-right: auto;
+        }
+
         /* Fun click effects */
         .click-effect {
             position: fixed;
@@ -398,6 +603,7 @@
         <h1>Unser erstes Jahr zusammen</h1>
         <p>I love you Mausi </p>
         <div class="fun-badge">✨ Anniversary Edition ✨</div>
+        <p class="edit-hint">💡 Karte antippen zum Umdrehen, lange gedrückt halten oder ✏️ antippen zum Bearbeiten</p>
     </div>
 
     <div class="timeline-container">
@@ -405,7 +611,7 @@
         
         <div class="photo-item">
             <div class="timeline-dot"></div>
-            <div class="polaroid" onclick="flipCard(this)">
+            <div class="polaroid">
                 <div class="polaroid-inner">
                     <div class="polaroid-front">
                         <img src="pics/pic1.jpeg" alt="Our memory" class="polaroid-photo">
@@ -421,7 +627,7 @@
 
         <div class="photo-item">
             <div class="timeline-dot"></div>
-            <div class="polaroid" onclick="flipCard(this)">
+            <div class="polaroid">
                 <div class="polaroid-inner">
                     <div class="polaroid-front">
                         <img src="pics/pic3.jpeg" alt="Our memory" class="polaroid-photo">
@@ -437,7 +643,7 @@
 
         <div class="photo-item">
             <div class="timeline-dot"></div>
-            <div class="polaroid" onclick="flipCard(this)">
+            <div class="polaroid">
                 <div class="polaroid-inner">
                     <div class="polaroid-front">
                         <img src="pics/pic4.jpeg" alt="Our memory" class="polaroid-photo">
@@ -453,7 +659,7 @@
 
         <div class="photo-item">
             <div class="timeline-dot"></div>
-            <div class="polaroid" onclick="flipCard(this)">
+            <div class="polaroid">
                 <div class="polaroid-inner">
                     <div class="polaroid-front">
                         <img src="pics/pic24.jpeg" alt="Our memory" class="polaroid-photo">
@@ -469,7 +675,7 @@
 
         <div class="photo-item">
             <div class="timeline-dot"></div>
-            <div class="polaroid" onclick="flipCard(this)">
+            <div class="polaroid">
                 <div class="polaroid-inner">
                     <div class="polaroid-front">
                         <img src="pics/pic25.jpeg" class="polaroid-photo"></img>
@@ -485,7 +691,7 @@
 
         <div class="photo-item">
             <div class="timeline-dot"></div>
-            <div class="polaroid" onclick="flipCard(this)">
+            <div class="polaroid">
                 <div class="polaroid-inner">
                     <div class="polaroid-front">
                         <video src="pics/vid1.mp4" class="polaroid-video" autoplay muted loop playsinline></video>
@@ -501,7 +707,7 @@
 
         <div class="photo-item">
             <div class="timeline-dot"></div>
-            <div class="polaroid" onclick="flipCard(this)">
+            <div class="polaroid">
                 <div class="polaroid-inner">
                     <div class="polaroid-front">
                         <img src="pics/pic5.jpeg" alt="Our memory" class="polaroid-photo">
@@ -517,7 +723,7 @@
 
         <div class="photo-item">
             <div class="timeline-dot"></div>
-            <div class="polaroid" onclick="flipCard(this)">
+            <div class="polaroid">
                 <div class="polaroid-inner">
                     <div class="polaroid-front">
                         <img src="pics/vid5.mp4" alt="Our memory" class="polaroid-photo">
@@ -533,7 +739,7 @@
 
         <div class="photo-item">
             <div class="timeline-dot"></div>
-            <div class="polaroid" onclick="flipCard(this)">
+            <div class="polaroid">
                 <div class="polaroid-inner">
                     <div class="polaroid-front">
                         <img src="pics/pic6.jpeg" alt="Our memory" class="polaroid-photo">
@@ -549,7 +755,7 @@
 
         <div class="photo-item">
             <div class="timeline-dot"></div>
-            <div class="polaroid" onclick="flipCard(this)">
+            <div class="polaroid">
                 <div class="polaroid-inner">
                     <div class="polaroid-front">
                         <img src="pics/vid6.mp4" alt="Our memory" class="polaroid-photo">
@@ -565,7 +771,7 @@
 
         <div class="photo-item">
             <div class="timeline-dot"></div>
-            <div class="polaroid" onclick="flipCard(this)">
+            <div class="polaroid">
                 <div class="polaroid-inner">
                     <div class="polaroid-front">
                         <img src="pics/pic22.jpeg" alt="Our memory" class="polaroid-photo">
@@ -581,7 +787,7 @@
 
         <div class="photo-item">
             <div class="timeline-dot"></div>
-            <div class="polaroid" onclick="flipCard(this)">
+            <div class="polaroid">
                 <div class="polaroid-inner">
                     <div class="polaroid-front">
                         <img src="pics/pic7.jpeg" alt="Our memory" class="polaroid-photo">
@@ -597,7 +803,7 @@
 
         <div class="photo-item">
             <div class="timeline-dot"></div>
-            <div class="polaroid" onclick="flipCard(this)">
+            <div class="polaroid">
                 <div class="polaroid-inner">
                     <div class="polaroid-front">
                         <img src="pics/pic8.jpeg" alt="Our memory" class="polaroid-photo">
@@ -613,7 +819,7 @@
 
         <div class="photo-item">
             <div class="timeline-dot"></div>
-            <div class="polaroid" onclick="flipCard(this)">
+            <div class="polaroid">
                 <div class="polaroid-inner">
                     <div class="polaroid-front">
                         <img src="pics/pic9.jpeg" alt="Our memory" class="polaroid-photo">
@@ -629,7 +835,7 @@
 
         <div class="photo-item">
             <div class="timeline-dot"></div>
-            <div class="polaroid" onclick="flipCard(this)">
+            <div class="polaroid">
                 <div class="polaroid-inner">
                     <div class="polaroid-front">
                         <img src="pics/pic10.jpeg" alt="Our memory" class="polaroid-photo">
@@ -645,7 +851,7 @@
 
         <div class="photo-item">
             <div class="timeline-dot"></div>
-            <div class="polaroid" onclick="flipCard(this)">
+            <div class="polaroid">
                 <div class="polaroid-inner">
                     <div class="polaroid-front">
                         <img src="pics/pic11.jpeg" alt="Our memory" class="polaroid-photo">
@@ -661,7 +867,7 @@
 
         <div class="photo-item">
             <div class="timeline-dot"></div>
-            <div class="polaroid" onclick="flipCard(this)">
+            <div class="polaroid">
                 <div class="polaroid-inner">
                     <div class="polaroid-front">
                         <img src="pics/pic21.jpeg" alt="Our memory" class="polaroid-photo">
@@ -677,7 +883,7 @@
 
         <div class="photo-item">
             <div class="timeline-dot"></div>
-            <div class="polaroid" onclick="flipCard(this)">
+            <div class="polaroid">
                 <div class="polaroid-inner">
                     <div class="polaroid-front">
                         <img src="pics/pic12.jpeg" alt="Our memory" class="polaroid-photo">
@@ -693,7 +899,7 @@
 
         <div class="photo-item">
             <div class="timeline-dot"></div>
-            <div class="polaroid" onclick="flipCard(this)">
+            <div class="polaroid">
                 <div class="polaroid-inner">
                     <div class="polaroid-front">
                         <video src="pics/vid3.mp4" class="polaroid-video" autoplay muted loop playsinline></video>
@@ -709,7 +915,7 @@
 
         <div class="photo-item">
             <div class="timeline-dot"></div>
-            <div class="polaroid" onclick="flipCard(this)">
+            <div class="polaroid">
                 <div class="polaroid-inner">
                     <div class="polaroid-front">
                         <img src="pics/pic17.jpeg" alt="Our memory" class="polaroid-photo">
@@ -725,7 +931,7 @@
 
         <div class="photo-item">
             <div class="timeline-dot"></div>
-            <div class="polaroid" onclick="flipCard(this)">
+            <div class="polaroid">
                 <div class="polaroid-inner">
                     <div class="polaroid-front">
                         <img src="pics/pic20.jpg" alt="Our memory" class="polaroid-photo">
@@ -741,7 +947,7 @@
 
         <div class="photo-item">
             <div class="timeline-dot"></div>
-            <div class="polaroid" onclick="flipCard(this)">
+            <div class="polaroid">
                 <div class="polaroid-inner">
                     <div class="polaroid-front">
                         <img src="pics/pic19.jpeg" alt="Our memory" class="polaroid-photo">
@@ -757,7 +963,7 @@
 
         <div class="photo-item">
             <div class="timeline-dot"></div>
-            <div class="polaroid" onclick="flipCard(this)">
+            <div class="polaroid">
                 <div class="polaroid-inner">
                     <div class="polaroid-front">
                         <img src="pics/pic16.jpeg" alt="kayak" class="polaroid-photo">
@@ -773,7 +979,7 @@
 
         <div class="photo-item">
             <div class="timeline-dot"></div>
-            <div class="polaroid" onclick="flipCard(this)">
+            <div class="polaroid">
                 <div class="polaroid-inner">
                     <div class="polaroid-front">
                         <img src="pics/pic13.jpeg" alt="Our memory" class="polaroid-photo">
@@ -789,7 +995,7 @@
 
         <div class="photo-item">
             <div class="timeline-dot"></div>
-            <div class="polaroid" onclick="flipCard(this)">
+            <div class="polaroid">
                 <div class="polaroid-inner">
                     <div class="polaroid-front">
                         <video src="pics/vid2.mp4" class="polaroid-video" autoplay muted loop playsinline></video>
@@ -805,7 +1011,7 @@
 
        <div class="photo-item">
             <div class="timeline-dot"></div>
-            <div class="polaroid" onclick="flipCard(this)">
+            <div class="polaroid">
                 <div class="polaroid-inner">
                     <div class="polaroid-front">
                         <img src="pics/pic2.jpeg" alt="Our memory" class="polaroid-photo">
@@ -821,7 +1027,7 @@
 
         <div class="photo-item">
             <div class="timeline-dot"></div>
-            <div class="polaroid" onclick="flipCard(this)">
+            <div class="polaroid">
                 <div class="polaroid-inner">
                     <div class="polaroid-front">
                          <video src="pics/vid4.mp4" class="polaroid-video" autoplay muted loop playsinline></video>
@@ -837,7 +1043,7 @@
 
         <div class="photo-item">
             <div class="timeline-dot"></div>
-            <div class="polaroid" onclick="flipCard(this)">
+            <div class="polaroid">
                 <div class="polaroid-inner">
                     <div class="polaroid-front">
                         <img src="pics/pic14.jpeg" alt="Our memory" class="polaroid-photo">
@@ -853,7 +1059,7 @@
 
             <div class="photo-item">
                 <div class="timeline-dot"></div>
-                <div class="polaroid" onclick="flipCard(this)">
+                <div class="polaroid">
                     <div class="polaroid-inner">
                         <div class="polaroid-front">
                             <img src="pics/pic23.jpeg" alt="Our memory" class="polaroid-photo">
@@ -869,7 +1075,7 @@
 
         <div class="photo-item">
             <div class="timeline-dot"></div>
-                <div class="polaroid" onclick="flipCard(this)">
+                <div class="polaroid">
                     <div class="polaroid-inner">
                         <div class="polaroid-front">
                             <img src="pics/pic15.jpeg" alt="Our memory" class="polaroid-photo">
@@ -888,6 +1094,33 @@
     <div class="footer">
         <p>Ein ganzes Jahr mit Mausi schon vorbei?</p>
         <div class="footer-badge">🎉 Auf viele weitere mausige Jahre zusammen! 🎉</div>
+    </div>
+
+    <button id="addCardBtn" class="add-card-btn" aria-label="Neue Karte hinzufügen" title="Neue Erinnerung hinzufügen">+</button>
+
+    <div id="cardModalOverlay" class="card-modal-overlay">
+        <div class="card-modal">
+            <h2 id="cardModalTitle">Karte bearbeiten</h2>
+
+            <div class="card-modal-media-preview" id="cardModalPreview">
+                <span id="cardModalPreviewPlaceholder">Kein Bild/Video ausgewählt</span>
+            </div>
+            <input type="file" id="cardModalFileInput" accept="image/*,video/*" hidden>
+            <button type="button" class="card-modal-btn secondary" id="cardModalChangeMediaBtn">📷 Bild/Video wählen</button>
+
+            <label class="card-modal-label" for="cardModalDate">Datum</label>
+            <input type="text" id="cardModalDate" class="card-modal-input" placeholder="z. B. 12. August 2025">
+
+            <label class="card-modal-label" for="cardModalMessage">Text</label>
+            <textarea id="cardModalMessage" class="card-modal-textarea" placeholder="Eure Erinnerung..."></textarea>
+
+            <div class="card-modal-actions">
+                <button type="button" class="card-modal-btn danger" id="cardModalDeleteBtn">🗑️ Löschen</button>
+                <button type="button" class="card-modal-btn secondary" id="cardModalResetBtn">↺ Zurücksetzen</button>
+                <button type="button" class="card-modal-btn ghost" id="cardModalCancelBtn">Abbrechen</button>
+                <button type="button" class="card-modal-btn primary" id="cardModalSaveBtn">💾 Speichern</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -923,7 +1156,7 @@
 
         // Enhanced sparkle party effects
         document.addEventListener('click', function(e) {
-            if (!e.target.closest('.polaroid')) {
+            if (!e.target.closest('.polaroid') && !e.target.closest('.card-modal-overlay') && !e.target.closest('.add-card-btn')) {
                 const baseX = e.clientX;
                 const baseY = e.clientY;
                 
@@ -956,6 +1189,493 @@
                 }
             }, 2000);
         }
+
+        /* ===================== Editable cards ===================== */
+
+        const OVERRIDES_KEY = 'annivOverrides';
+        const CUSTOM_KEY = 'annivCustomCards';
+        const DB_NAME = 'annivMediaDB';
+        const STORE_NAME = 'media';
+        const LONG_PRESS_MS = 500;
+        const MOVE_TOLERANCE = 10;
+
+        // --- IndexedDB helpers (stores uploaded images/videos as Blobs) ---
+        function idbOpen() {
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open(DB_NAME, 1);
+                req.onupgradeneeded = () => req.result.createObjectStore(STORE_NAME);
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        async function idbPut(id, blob) {
+            const db = await idbOpen();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(STORE_NAME, 'readwrite');
+                tx.objectStore(STORE_NAME).put(blob, id);
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => reject(tx.error);
+            });
+        }
+
+        async function idbGet(id) {
+            const db = await idbOpen();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(STORE_NAME, 'readonly');
+                const req = tx.objectStore(STORE_NAME).get(id);
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        async function idbDelete(id) {
+            const db = await idbOpen();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(STORE_NAME, 'readwrite');
+                tx.objectStore(STORE_NAME).delete(id);
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => reject(tx.error);
+            });
+        }
+
+        // --- localStorage helpers ---
+        function getOverrides() {
+            try { return JSON.parse(localStorage.getItem(OVERRIDES_KEY) || '{}'); }
+            catch (e) { return {}; }
+        }
+        function setOverrides(data) { localStorage.setItem(OVERRIDES_KEY, JSON.stringify(data)); }
+
+        function getCustomCards() {
+            try { return JSON.parse(localStorage.getItem(CUSTOM_KEY) || '[]'); }
+            catch (e) { return []; }
+        }
+        function setCustomCards(data) { localStorage.setItem(CUSTOM_KEY, JSON.stringify(data)); }
+
+        // --- Card content helpers ---
+        function textSizeClass(text) {
+            const len = (text || '').length;
+            if (len > 220) return 'very-long-text';
+            if (len > 140) return 'long-text';
+            if (len > 70) return 'medium-text';
+            return 'short-text';
+        }
+
+        function updateCardText(polaroid, date, message) {
+            const dateEl = polaroid.querySelector('.polaroid-front .photo-date');
+            const msgEl = polaroid.querySelector('.polaroid-back .love-message');
+            if (dateEl && date !== undefined) dateEl.textContent = date;
+            if (msgEl && message !== undefined) {
+                msgEl.textContent = message;
+                msgEl.className = 'love-message ' + textSizeClass(message);
+            }
+        }
+
+        function setCardMedia(front, src, type) {
+            const old = front.querySelector('.polaroid-photo, .polaroid-video, .polaroid-gif, .photo-placeholder');
+            let el;
+            if (type === 'video') {
+                el = document.createElement('video');
+                el.className = 'polaroid-video';
+                el.autoplay = true;
+                el.muted = true;
+                el.loop = true;
+                el.playsInline = true;
+            } else {
+                el = document.createElement('img');
+                el.className = 'polaroid-photo';
+                el.alt = 'Our memory';
+            }
+            el.src = src;
+            if (old) old.replaceWith(el);
+            else front.insertBefore(el, front.firstChild);
+        }
+
+        function addEditButtons(polaroid) {
+            ['.polaroid-front', '.polaroid-back'].forEach(sel => {
+                const face = polaroid.querySelector(sel);
+                if (!face || face.querySelector('.card-edit-btn')) return;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'card-edit-btn';
+                btn.setAttribute('aria-label', 'Karte bearbeiten');
+                btn.textContent = '✏️';
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openEditorForCard(polaroid);
+                });
+                face.appendChild(btn);
+            });
+        }
+
+        function attachCardInteractions(polaroid) {
+            let pressTimer = null;
+            let longPressFired = false;
+            let startX = 0, startY = 0;
+
+            function clearPressTimer() {
+                if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
+            }
+
+            polaroid.addEventListener('pointerdown', (e) => {
+                if (e.target.closest('.card-edit-btn')) return;
+                if (e.pointerType === 'mouse' && e.button !== 0) return;
+                longPressFired = false;
+                startX = e.clientX;
+                startY = e.clientY;
+                pressTimer = setTimeout(() => {
+                    longPressFired = true;
+                    pressTimer = null;
+                    if (navigator.vibrate) navigator.vibrate(15);
+                    openEditorForCard(polaroid);
+                }, LONG_PRESS_MS);
+            });
+
+            polaroid.addEventListener('pointermove', (e) => {
+                if (!pressTimer) return;
+                if (Math.abs(e.clientX - startX) > MOVE_TOLERANCE || Math.abs(e.clientY - startY) > MOVE_TOLERANCE) {
+                    clearPressTimer();
+                }
+            });
+
+            ['pointerup', 'pointerleave', 'pointercancel'].forEach(evt =>
+                polaroid.addEventListener(evt, clearPressTimer)
+            );
+
+            polaroid.addEventListener('click', (e) => {
+                if (e.target.closest('.card-edit-btn')) return;
+                if (longPressFired) { longPressFired = false; return; }
+                flipCard(polaroid);
+            });
+
+            polaroid.addEventListener('contextmenu', (e) => e.preventDefault());
+        }
+
+        function buildCardDOM(id, date, message, mediaSrc, mediaType) {
+            const item = document.createElement('div');
+            item.className = 'photo-item';
+
+            const dot = document.createElement('div');
+            dot.className = 'timeline-dot';
+            item.appendChild(dot);
+
+            const polaroid = document.createElement('div');
+            polaroid.className = 'polaroid';
+            polaroid.dataset.cardId = id;
+
+            const inner = document.createElement('div');
+            inner.className = 'polaroid-inner';
+
+            const front = document.createElement('div');
+            front.className = 'polaroid-front';
+            if (mediaSrc) setCardMedia(front, mediaSrc, mediaType);
+            const dateDiv = document.createElement('div');
+            dateDiv.className = 'photo-date';
+            dateDiv.textContent = date;
+            front.appendChild(dateDiv);
+
+            const back = document.createElement('div');
+            back.className = 'polaroid-back';
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'love-message ' + textSizeClass(message);
+            msgDiv.textContent = message;
+            const heartDiv = document.createElement('div');
+            heartDiv.className = 'heart-decoration';
+            heartDiv.textContent = '💕💖💕';
+            back.appendChild(msgDiv);
+            back.appendChild(heartDiv);
+
+            inner.appendChild(front);
+            inner.appendChild(back);
+            polaroid.appendChild(inner);
+            item.appendChild(polaroid);
+
+            addEditButtons(polaroid);
+            attachCardInteractions(polaroid);
+
+            return item;
+        }
+
+        function initOriginalCards() {
+            document.querySelectorAll('.timeline-container > .photo-item').forEach((item, i) => {
+                const polaroid = item.querySelector('.polaroid');
+                const front = polaroid.querySelector('.polaroid-front');
+                const back = polaroid.querySelector('.polaroid-back');
+                const dateEl = front.querySelector('.photo-date');
+                const msgEl = back.querySelector('.love-message');
+                const mediaEl = front.querySelector('.polaroid-photo, .polaroid-video, .polaroid-gif');
+
+                polaroid.dataset.cardId = 'orig-' + i;
+                polaroid.dataset.origDate = dateEl ? dateEl.textContent.trim() : '';
+                polaroid.dataset.origMessage = msgEl ? msgEl.textContent.trim() : '';
+                polaroid.dataset.origSrc = mediaEl ? mediaEl.getAttribute('src') : '';
+                polaroid.dataset.origType = mediaEl && mediaEl.tagName === 'VIDEO' ? 'video' : 'image';
+
+                addEditButtons(polaroid);
+                attachCardInteractions(polaroid);
+            });
+        }
+
+        async function applyOverrides() {
+            const overrides = getOverrides();
+            const polaroids = document.querySelectorAll('.polaroid[data-card-id^="orig-"]');
+            for (const polaroid of polaroids) {
+                const ov = overrides[polaroid.dataset.cardId];
+                if (!ov) continue;
+                updateCardText(polaroid, ov.date, ov.message);
+                if (ov.mediaId) {
+                    try {
+                        const blob = await idbGet(ov.mediaId);
+                        if (blob) {
+                            const url = URL.createObjectURL(blob);
+                            setCardMedia(polaroid.querySelector('.polaroid-front'), url, ov.mediaType);
+                        }
+                    } catch (e) { /* ignore missing media */ }
+                }
+            }
+        }
+
+        async function loadCustomCards() {
+            const container = document.querySelector('.timeline-container');
+            const cards = getCustomCards();
+            for (const c of cards) {
+                let src = '';
+                if (c.mediaId) {
+                    try {
+                        const blob = await idbGet(c.mediaId);
+                        if (blob) src = URL.createObjectURL(blob);
+                    } catch (e) { /* ignore missing media */ }
+                }
+                container.appendChild(buildCardDOM(c.id, c.date, c.message, src, c.mediaType));
+            }
+        }
+
+        // --- Editor modal ---
+        const cardModalOverlay = document.getElementById('cardModalOverlay');
+        const cardModalTitle = document.getElementById('cardModalTitle');
+        const cardModalPreview = document.getElementById('cardModalPreview');
+        const cardModalFileInput = document.getElementById('cardModalFileInput');
+        const cardModalChangeMediaBtn = document.getElementById('cardModalChangeMediaBtn');
+        const cardModalDate = document.getElementById('cardModalDate');
+        const cardModalMessage = document.getElementById('cardModalMessage');
+        const cardModalDeleteBtn = document.getElementById('cardModalDeleteBtn');
+        const cardModalResetBtn = document.getElementById('cardModalResetBtn');
+        const cardModalCancelBtn = document.getElementById('cardModalCancelBtn');
+        const cardModalSaveBtn = document.getElementById('cardModalSaveBtn');
+        const addCardBtn = document.getElementById('addCardBtn');
+
+        let modalMode = 'edit';
+        let modalTargetPolaroid = null;
+        let modalSelectedFile = null;
+        let modalPreviewObjectUrl = null;
+
+        function showModalPreview(src, type) {
+            if (modalPreviewObjectUrl) {
+                URL.revokeObjectURL(modalPreviewObjectUrl);
+                modalPreviewObjectUrl = null;
+            }
+            cardModalPreview.innerHTML = '';
+            if (!src) {
+                const span = document.createElement('span');
+                span.id = 'cardModalPreviewPlaceholder';
+                span.textContent = 'Kein Bild/Video ausgewählt';
+                cardModalPreview.appendChild(span);
+                return;
+            }
+            const el = type === 'video' ? document.createElement('video') : document.createElement('img');
+            if (type === 'video') {
+                el.muted = true;
+                el.loop = true;
+                el.autoplay = true;
+                el.playsInline = true;
+            }
+            el.src = src;
+            cardModalPreview.appendChild(el);
+        }
+
+        function openModal() { cardModalOverlay.classList.add('open'); }
+        function closeModal() {
+            cardModalOverlay.classList.remove('open');
+            if (modalPreviewObjectUrl) {
+                URL.revokeObjectURL(modalPreviewObjectUrl);
+                modalPreviewObjectUrl = null;
+            }
+            modalSelectedFile = null;
+            modalTargetPolaroid = null;
+            cardModalFileInput.value = '';
+        }
+
+        function openEditorForCard(polaroid) {
+            modalMode = 'edit';
+            modalTargetPolaroid = polaroid;
+            modalSelectedFile = null;
+
+            const front = polaroid.querySelector('.polaroid-front');
+            const back = polaroid.querySelector('.polaroid-back');
+            const dateEl = front.querySelector('.photo-date');
+            const msgEl = back.querySelector('.love-message');
+            const mediaEl = front.querySelector('.polaroid-photo, .polaroid-video, .polaroid-gif');
+
+            cardModalTitle.textContent = 'Karte bearbeiten';
+            cardModalDate.value = dateEl ? dateEl.textContent.trim() : '';
+            cardModalMessage.value = msgEl ? msgEl.textContent.trim() : '';
+
+            const existingSrc = mediaEl ? mediaEl.getAttribute('src') : '';
+            const existingType = mediaEl && mediaEl.tagName === 'VIDEO' ? 'video' : 'image';
+            showModalPreview(existingSrc, existingType);
+
+            const isCustom = polaroid.dataset.cardId.startsWith('custom-');
+            cardModalDeleteBtn.style.display = isCustom ? 'inline-flex' : 'none';
+            cardModalResetBtn.style.display = isCustom ? 'none' : 'inline-flex';
+
+            openModal();
+        }
+
+        function openEditorForNewCard() {
+            modalMode = 'create';
+            modalTargetPolaroid = null;
+            modalSelectedFile = null;
+
+            cardModalTitle.textContent = 'Neue Erinnerung hinzufügen';
+            cardModalDate.value = '';
+            cardModalMessage.value = '';
+            showModalPreview(null, null);
+
+            cardModalDeleteBtn.style.display = 'none';
+            cardModalResetBtn.style.display = 'none';
+
+            openModal();
+        }
+
+        cardModalChangeMediaBtn.addEventListener('click', () => cardModalFileInput.click());
+
+        cardModalFileInput.addEventListener('change', () => {
+            const file = cardModalFileInput.files[0];
+            if (!file) return;
+            modalSelectedFile = file;
+            if (modalPreviewObjectUrl) URL.revokeObjectURL(modalPreviewObjectUrl);
+            modalPreviewObjectUrl = URL.createObjectURL(file);
+            const type = file.type.startsWith('video/') ? 'video' : 'image';
+            cardModalPreview.innerHTML = '';
+            const el = type === 'video' ? document.createElement('video') : document.createElement('img');
+            if (type === 'video') { el.muted = true; el.loop = true; el.autoplay = true; el.playsInline = true; }
+            el.src = modalPreviewObjectUrl;
+            cardModalPreview.appendChild(el);
+        });
+
+        cardModalCancelBtn.addEventListener('click', closeModal);
+        cardModalOverlay.addEventListener('click', (e) => {
+            if (e.target === cardModalOverlay) closeModal();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && cardModalOverlay.classList.contains('open')) closeModal();
+        });
+
+        cardModalSaveBtn.addEventListener('click', async () => {
+            const dateVal = cardModalDate.value.trim();
+            const msgVal = cardModalMessage.value.trim();
+
+            if (!msgVal) { alert('Bitte einen Text eingeben.'); return; }
+            if (modalMode === 'create' && !modalSelectedFile) { alert('Bitte ein Bild oder Video auswählen.'); return; }
+
+            let mediaId = null, mediaType = null;
+            if (modalSelectedFile) {
+                mediaId = 'media-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+                mediaType = modalSelectedFile.type.startsWith('video/') ? 'video' : 'image';
+                try {
+                    await idbPut(mediaId, modalSelectedFile);
+                } catch (e) {
+                    alert('Das Bild/Video konnte nicht gespeichert werden (evtl. zu groß für den Browser-Speicher).');
+                    return;
+                }
+            }
+
+            if (modalMode === 'edit') {
+                const id = modalTargetPolaroid.dataset.cardId;
+                updateCardText(modalTargetPolaroid, dateVal, msgVal);
+
+                if (id.startsWith('custom-')) {
+                    const cards = getCustomCards();
+                    const card = cards.find(c => c.id === id);
+                    if (card) {
+                        card.date = dateVal;
+                        card.message = msgVal;
+                        if (mediaId) { card.mediaId = mediaId; card.mediaType = mediaType; }
+                        setCustomCards(cards);
+                    }
+                } else {
+                    const overrides = getOverrides();
+                    const ov = overrides[id] || {};
+                    ov.date = dateVal;
+                    ov.message = msgVal;
+                    if (mediaId) { ov.mediaId = mediaId; ov.mediaType = mediaType; }
+                    overrides[id] = ov;
+                    setOverrides(overrides);
+                }
+
+                if (mediaId) {
+                    const url = URL.createObjectURL(modalSelectedFile);
+                    setCardMedia(modalTargetPolaroid.querySelector('.polaroid-front'), url, mediaType);
+                }
+            } else {
+                const id = 'custom-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+                const cards = getCustomCards();
+                cards.push({ id, date: dateVal, message: msgVal, mediaId, mediaType });
+                setCustomCards(cards);
+
+                const url = URL.createObjectURL(modalSelectedFile);
+                const container = document.querySelector('.timeline-container');
+                container.appendChild(buildCardDOM(id, dateVal, msgVal, url, mediaType));
+            }
+
+            closeModal();
+        });
+
+        cardModalDeleteBtn.addEventListener('click', async () => {
+            if (!modalTargetPolaroid) return;
+            if (!confirm('Diese Karte wirklich löschen?')) return;
+
+            const id = modalTargetPolaroid.dataset.cardId;
+            const cards = getCustomCards();
+            const target = cards.find(c => c.id === id);
+            setCustomCards(cards.filter(c => c.id !== id));
+            if (target && target.mediaId) {
+                try { await idbDelete(target.mediaId); } catch (e) { /* ignore */ }
+            }
+            modalTargetPolaroid.closest('.photo-item').remove();
+            closeModal();
+        });
+
+        cardModalResetBtn.addEventListener('click', async () => {
+            if (!modalTargetPolaroid) return;
+
+            const id = modalTargetPolaroid.dataset.cardId;
+            const overrides = getOverrides();
+            const ov = overrides[id];
+            if (ov && ov.mediaId) {
+                try { await idbDelete(ov.mediaId); } catch (e) { /* ignore */ }
+            }
+            delete overrides[id];
+            setOverrides(overrides);
+
+            updateCardText(modalTargetPolaroid, modalTargetPolaroid.dataset.origDate, modalTargetPolaroid.dataset.origMessage);
+            setCardMedia(
+                modalTargetPolaroid.querySelector('.polaroid-front'),
+                modalTargetPolaroid.dataset.origSrc,
+                modalTargetPolaroid.dataset.origType
+            );
+
+            closeModal();
+        });
+
+        addCardBtn.addEventListener('click', openEditorForNewCard);
+
+        // --- Init ---
+        (async function initEditableCards() {
+            initOriginalCards();
+            await applyOverrides();
+            await loadCustomCards();
+        })();
     </script>
 </body>
 </html>
